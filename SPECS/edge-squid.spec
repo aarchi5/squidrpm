@@ -4,15 +4,15 @@
 %global debug_package %{nil}
 
 Name:     edge-squid
-Version:  5.9
+Version:  6.14
 Release:  6%{?dist}
 Summary:  The Squid proxy caching server
 Epoch:    7
 # See CREDITS for breakdown of non GPLv2+ code
 License:  GPLv2+ and (LGPLv2+ and MIT and BSD and Public Domain)
 URL:      http://www.squid-cache.org
-Source0:  http://www.squid-cache.org/Versions/v5/squid-%{version}.tar.xz
-Source1:  http://www.squid-cache.org/Versions/v5/squid-%{version}.tar.xz.asc
+Source0:  http://www.squid-cache.org/Versions/v6/squid-%{version}.tar.xz
+Source1:  http://www.squid-cache.org/Versions/v6/squid-%{version}.tar.xz.asc
 Source2:  squid.logrotate
 Source3:  squid.sysconfig
 Source4:  squid.pam
@@ -64,11 +64,16 @@ BuildRequires: libcap-devel
 BuildRequires: libecap-devel
 #ip_user helper requires
 BuildRequires: gcc-c++
+BuildRequires: gcc
 BuildRequires: libtool libtool-ltdl-devel
 #BuildRequires: perl-generators
 # For test suite
 BuildRequires: pkgconfig(cppunit)
 BuildRequires: autoconf
+BuildRequires: autoconf-archive
+BuildRequires: automake
+BuildRequires: m4
+BuildRequires: make
 
 %description
 Squid is a high-performance proxy caching server for Web clients,
@@ -90,17 +95,20 @@ lookup program (dnsserver), a program for retrieving FTP data
 # Backported patches
 
 # Local patches
-%patch201 -p1 -b .config
-%patch202 -p1 -b .location
+%patch 201 -p1 -b .config
+%patch 202 -p1 -b .location
 #%patch203 -p1 -b .perlpath
-%patch204 -p0 -b .include-guards
+#The fix for Bug 4323 is already included in Squid 6.14, so the patch is no longer necessary.
+#%patch 204 -p0 -b .include-guards
 #%patch205 -p1 -b .large_acl
-%patch206 -p1 -b .active-ftp
+#%patch 206 -p1 -b .active-ftp
 #%patch207 -p1 -b .man-pages
 #%patch301 -p1 -b .aws-lnb-excessive-log.patch
 #%patch302 -p1 -b .ssl-forgery
-%patch303 -p1 -b .extra-patch-host-header-forgery.patch
-%patch304 -p1 -b .ip-cache-lookup.patch
+%patch 303 -p1 -b .extra-patch-host-header-forgery.patch
+#Case insensitive lookup is included in Squid 6.14 at entry creation level, so the patch is no longer necessary.
+#%patch304 -p1 -b .ip-cache-lookup.patch
+
 
 %build
 # cppunit-config patch changes configure.ac
