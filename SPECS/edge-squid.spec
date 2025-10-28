@@ -151,7 +151,7 @@ LDFLAGS="$RPM_LD_FLAGS -pie -Wl,-z,relro -Wl,-z,now -Wl,--warn-shared-textrel"
    --with-pthreads \
    --disable-arch-native \
    --with-pic \
-   --disable-ipv6 \
+   --enable-ipv6 \
    --disable-security-cert-validators
 
 make \
