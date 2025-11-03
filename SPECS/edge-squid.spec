@@ -4,15 +4,15 @@
 %global debug_package %{nil}
 
 Name:     edge-squid
-Version:  5.9
+Version:  7.2
 Release:  6%{?dist}
 Summary:  The Squid proxy caching server
 Epoch:    7
 # See CREDITS for breakdown of non GPLv2+ code
 License:  GPLv2+ and (LGPLv2+ and MIT and BSD and Public Domain)
 URL:      http://www.squid-cache.org
-Source0:  http://www.squid-cache.org/Versions/v5/squid-%{version}.tar.xz
-Source1:  http://www.squid-cache.org/Versions/v5/squid-%{version}.tar.xz.asc
+Source0:  http://www.squid-cache.org/Versions/v7/squid-%{version}.tar.xz
+Source1:  http://www.squid-cache.org/Versions/v7/squid-%{version}.tar.xz.asc
 Source2:  squid.logrotate
 Source3:  squid.sysconfig
 Source4:  squid.pam
@@ -90,17 +90,20 @@ lookup program (dnsserver), a program for retrieving FTP data
 # Backported patches
 
 # Local patches
-%patch201 -p1 -b .config
-%patch202 -p1 -b .location
+%patch 201 -p1 -b .config
+%patch 202 -p1 -b .location
 #%patch203 -p1 -b .perlpath
-%patch204 -p0 -b .include-guards
+#The fix for Bug 4323 is already included in Squid 6.14, so the patch is no longer necessary.
+#%patch 204 -p0 -b .include-guards
 #%patch205 -p1 -b .large_acl
-%patch206 -p1 -b .active-ftp
+#%patch 206 -p1 -b .active-ftp
 #%patch207 -p1 -b .man-pages
 #%patch301 -p1 -b .aws-lnb-excessive-log.patch
 #%patch302 -p1 -b .ssl-forgery
-%patch303 -p1 -b .extra-patch-host-header-forgery.patch
-%patch304 -p1 -b .ip-cache-lookup.patch
+%patch 303 -p1 -b .extra-patch-host-header-forgery.patch
+#Case insensitive lookup is included in Squid 6.14 at entry creation level, so the patch is no longer necessary.
+#%patch304 -p1 -b .ip-cache-lookup.patch
+
 
 %build
 # cppunit-config patch changes configure.ac
@@ -124,8 +127,8 @@ LDFLAGS="$RPM_LD_FLAGS -pie -Wl,-z,relro -Wl,-z,now -Wl,--warn-shared-textrel"
    --disable-dependency-tracking \
    --enable-follow-x-forwarded-for \
    --enable-auth \
-   --enable-auth-basic="DB,fake,getpwnam,LDAP,NCSA,PAM,POP3,RADIUS,SASL,SMB,SMB_LM" \
-   --enable-auth-ntlm="SMB_LM,fake" \
+   --enable-auth-basic="DB,fake,getpwnam,LDAP,NCSA,PAM,POP3,RADIUS,SASL,SMB" \
+   --enable-auth-ntlm="fake" \
    --enable-auth-digest="file,LDAP" \
    --enable-auth-negotiate="kerberos" \
    --enable-external-acl-helpers="LDAP_group,session,unix_group,wbinfo_group,kerberos_ldap_group" \
@@ -170,14 +173,11 @@ echo "
 # This is %{_sysconfdir}/httpd/conf.d/squid.conf
 #
 
-ScriptAlias /Squid/cgi-bin/cachemgr.cgi %{_libdir}/squid/cachemgr.cgi
-
-# Only allow access from localhost by default
-<Location /Squid/cgi-bin/cachemgr.cgi>
- Require local
- # Add additional allowed hosts as needed
- # Require host example.com
-</Location>" > $RPM_BUILD_ROOT/squid.httpd.tmp
+# Note: cachemgr.cgi was removed in Squid 7.2
+# Cache Manager is now accessible directly via HTTP/HTTPS using the URL path /squid-internal-mgr/
+# Example: http://squid_hostname:port/squid-internal-mgr/menu
+# Use curl or a web browser to access Cache Manager reports
+" > $RPM_BUILD_ROOT/squid.httpd.tmp
 
 
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
@@ -237,7 +237,7 @@ rm -f $RPM_BUILD_ROOT/squid.httpd.tmp
 
 %config(noreplace) %attr(644,root,root) %{_sysconfdir}/httpd/conf.d/squid.conf
 %config(noreplace) %attr(640,root,squid) %{_sysconfdir}/squid/squid.conf
-%config(noreplace) %attr(644,root,squid) %{_sysconfdir}/squid/cachemgr.conf
+# cachemgr.conf removed in Squid 7.2 - Cache Manager now uses HTTP/HTTPS URLs directly
 %config(noreplace) %{_sysconfdir}/squid/mime.conf
 %config(noreplace) %{_sysconfdir}/squid/errorpage.css
 %config(noreplace) %{_sysconfdir}/sysconfig/squid
@@ -245,7 +245,6 @@ rm -f $RPM_BUILD_ROOT/squid.httpd.tmp
 %config %{_sysconfdir}/squid/squid.conf.default
 %config %{_sysconfdir}/squid/mime.conf.default
 %config %{_sysconfdir}/squid/errorpage.css.default
-%config %{_sysconfdir}/squid/cachemgr.conf.default
 %config(noreplace) %{_sysconfdir}/pam.d/squid
 %config(noreplace) %{_sysconfdir}/logrotate.d/squid
 
@@ -254,10 +253,9 @@ rm -f $RPM_BUILD_ROOT/squid.httpd.tmp
 %attr(755,root,root) %{_sysconfdir}/NetworkManager/dispatcher.d/20-squid
 %{_datadir}/squid/icons
 %{_sbindir}/squid
-%{_bindir}/squidclient
-%{_bindir}/purge
+# squidclient and purge tools removed in Squid 7.2 - use curl/wget and PURGE HTTP method instead
 %{_mandir}/man8/*
-%{_mandir}/man1/*
+# man1 pages removed in Squid 7.2 (squidclient and purge man pages no longer exist)
 %{_libdir}/squid/*
 %{_datadir}/snmp/mibs/SQUID-MIB.txt
 %{_tmpfilesdir}/squid.conf
