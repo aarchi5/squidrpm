@@ -4,7 +4,7 @@
 %global debug_package %{nil}
 
 Name:     edge-squid
-Version:  7.2
+Version:  7.3
 Release:  6%{?dist}
 Summary:  The Squid proxy caching server
 Epoch:    7
@@ -40,6 +40,8 @@ Patch206: squid-4.4.0-active-ftp.patch
 Patch303: squid-5.9-extra-patch-host-header-forgery.patch
 # https://bugs.squid-cache.org/show_bug.cgi?id=5185
 Patch304: squid-5.9-ip-cache-lookup.patch
+# Fix ERR_INVALID_URL for relative URI (GET / with Host) and CONNECT host without port (Squid 7.x)
+Patch305: squid-7-connect-default-https-port.patch
 
 Requires: bash >= 2.0
 Requires(pre): shadow-utils
@@ -103,6 +105,7 @@ lookup program (dnsserver), a program for retrieving FTP data
 %patch 303 -p1 -b .extra-patch-host-header-forgery.patch
 #Case insensitive lookup is included in Squid 6.14 at entry creation level, so the patch is no longer necessary.
 #%patch304 -p1 -b .ip-cache-lookup.patch
+%patch 305 -p1 -b .relative-uri-host-header.patch
 
 
 %build
