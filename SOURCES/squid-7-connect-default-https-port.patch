@@ -1,22 +1,14 @@
 --- a/src/anyp/Uri.cc
 +++ b/src/anyp/Uri.cc
-@@ -328,15 +328,16 @@
-         if (method == Http::METHOD_CONNECT) {
-             // For CONNECTs, RFC 9110 Section 9.3.6 requires "only the host and
-             // port number of the tunnel destination, separated by a colon".
- 
-             const auto rawHost = parseHost(tok);
-             Assure(rawHost.length() < sizeof(foundHost));
+@@ -334,8 +334,9 @@
              SBufToCstring(foundHost, rawHost);
  
--            if (!tok.skip(':'))
+             if (!tok.skip(':'))
 -                throw TextException("missing required :port in CONNECT target", Here());
 -            foundPort = parsePort(tok);
-+            if (!tok.skip(':'))
 +                foundPort = 443; // default to HTTPS port when client omits it
 +            else
 +                foundPort = parsePort(tok);
  
              if (!tok.remaining().isEmpty())
                  throw TextException("garbage after host:port in CONNECT target", Here());
-         } else {

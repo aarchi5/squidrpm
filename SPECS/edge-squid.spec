@@ -105,7 +105,7 @@ lookup program (dnsserver), a program for retrieving FTP data
 %patch 303 -p1 -b .extra-patch-host-header-forgery.patch
 #Case insensitive lookup is included in Squid 6.14 at entry creation level, so the patch is no longer necessary.
 #%patch304 -p1 -b .ip-cache-lookup.patch
-%patch 305 -p1 -b .relative-uri-host-header.patch
+%patch 305 -p1 -b .connect-default-https-port.patch
 
 
 %build
